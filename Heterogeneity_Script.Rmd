@@ -1,0 +1,70 @@
+---
+title: "Lab2_Script"
+author: "Marcela Morassi"
+date: "9/23/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+StartUp
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(RColorBrewer)
+library(rcompanion)
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+library(vegan)
+
+setwd("C:/Users/Marcela Morassi/Documents/Github/HeterogeneityLab")
+
+data <- read.csv("full_data_F21.csv")
+
+
+```
+
+Calibrating Canopy Estimates
+```{r}
+regression = lm(Percent_Cnpy_Open ~ Canopy, data = data)
+regression
+summary(regression)
+# Note that you should go with the "Multiple R-squared," not "Adjusted R-squared"
+
+ggplot(data = data, aes(x=Canopy, y=Percent_Cnpy_Open)) + geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, color = "grey") +
+  geom_jitter(height = 0, width = .15) +
+  theme_classic() + xlab("Subjective Canopy Cover") + ylab("Percent Openness")
+
+ggsave("Calibrating Canopy Estimates.png")
+
+```
+
+Relationship between canopy and ground cover
+```{r}
+table_data <- data %>% 
+  group_by(Canopy, Shrub, Ground) %>% 
+  dplyr::count(Shrub, Ground) %>% 
+  mutate(countSpe=sum(n))
+
+table_zero <- data %>% 
+  filter(Canopy == 0) %>% 
+  table(data$Ground, data$Shrub)
+
+
+ table_zero
+ 
+```
+
+
+
+
+
+
+
+
+
