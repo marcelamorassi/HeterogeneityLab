@@ -46,12 +46,67 @@ ggsave("Calibrating Canopy Estimates.png")
 
 Relationship between canopy and ground cover
 ```{r}
-table_zero <- data %>% 
-  select(filter(Canopy == 0)
+#canopy 0
+zero_canopy <- data %>% 
+  filter(Canopy == 0)
 
-table0 <- xtabs(~Ground + Shrub, data= table_zero) 
+table_zero <- xtabs(~Ground + Shrub, data= zero_canopy)
+ 
+chisq.test(table_zero)
 
-chisq.test(table0)
+canopy0 <- select(filter(data, Canopy == 0), Shrub, Ground)
+
+table(canopy0)
+
+chisq.test(canopy0)
+
+#canopy 1
+one_canopy <- data %>% 
+  filter(Canopy == 1)
+
+table_one <- xtabs(~Ground + Shrub, data= one_canopy)
+ 
+chisq.test(table_one)
+
+canopy1 <- select(filter(data, Canopy == 1), Shrub, Ground)
+
+table(canopy1)
+
+chisq.test(canopy1)
+
+#canopy 2
+two_canopy <- data %>% 
+  filter(Canopy == 2)
+
+table_two <- xtabs(~Ground + Shrub, data= two_canopy)
+ 
+chisq.test(table_two)
+
+canopy2 <- select(filter(data, Canopy == 2), Shrub, Ground)
+
+table(canopy2)
+
+chisq.test(canopy2)
+
+#canopy 3
+three_canopy <- data %>% 
+  filter(Canopy == 3)
+
+table_three <- xtabs(~Ground + Shrub, data= three_canopy)
+ 
+chisq.test(table_three)
+
+canopy3 <- select(filter(data, Canopy == 3), Shrub, Ground)
+
+table(canopy3)
+
+chisq.test(canopy3)
+
+#PROPORTIONAL TABLES
+
+#canopy 0
+prop0 <- prop.table(canopy0)
+prop0
  
 ```
 
