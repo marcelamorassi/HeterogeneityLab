@@ -46,17 +46,12 @@ ggsave("Calibrating Canopy Estimates.png")
 
 Relationship between canopy and ground cover
 ```{r}
-table_data <- data %>% 
-  group_by(Canopy, Shrub, Ground) %>% 
-  dplyr::count(Shrub, Ground) %>% 
-  mutate(countSpe=sum(n))
-
 table_zero <- data %>% 
-  filter(Canopy == 0) %>% 
-  table(data$Ground, data$Shrub)
+  select(filter(Canopy == 0)
 
+table0 <- xtabs(~Ground + Shrub, data= table_zero) 
 
- table_zero
+chisq.test(table0)
  
 ```
 
