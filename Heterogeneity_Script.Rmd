@@ -20,11 +20,13 @@ library(dplyr)
 library(ggplot2)
 library(ggforce)
 library(vegan)
+theme_set(theme_classic()) # Set the theme
+
 
 setwd("C:/Users/Marcela Morassi/Documents/Github/HeterogeneityLab")
 
 data <- read.csv("full_data_F21.csv")
-
+old_data <- read.csv("F20_heterogeneity_data.csv")
 
 ```
 
@@ -44,7 +46,7 @@ ggsave("Calibrating Canopy Estimates.png")
 
 ```
 
-Relationship between canopy and ground cover
+Relationship between canopy and ground cover pt. 1
 ```{r}
 #canopy 0
 zero_canopy <- data %>% 
@@ -53,12 +55,20 @@ zero_canopy <- data %>%
 table_zero <- xtabs(~Ground + Shrub, data= zero_canopy)
  
 chisq.test(table_zero)
+table0_freq <- as.data.frame( table_zero/sum(table_zero) ) %>% 
+  mutate(cover = 0)
 
-canopy0 <- select(filter(data, Canopy == 0), Shrub, Ground)
-
-table(canopy0)
-
-chisq.test(canopy0)
+table0_freq %>% 
+  ggplot(aes(x = Ground, y = Shrub)) +
+  geom_tile(aes(fill = Freq)) +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  geom_label(aes(label = round(Freq, 3)),
+            label.size = 0, # Keep this as is
+            color = "white", # Text color
+            fill = "#00000010", # Slight background around text to make it more legible
+            size = 5) # text size
+ggsave("Canopy Cover 0.png")  
 
 #canopy 1
 one_canopy <- data %>% 
@@ -67,12 +77,20 @@ one_canopy <- data %>%
 table_one <- xtabs(~Ground + Shrub, data= one_canopy)
  
 chisq.test(table_one)
+table1_freq <- as.data.frame( table_one/sum(table_one) )%>% 
+  mutate(cover = 1)
 
-canopy1 <- select(filter(data, Canopy == 1), Shrub, Ground)
-
-table(canopy1)
-
-chisq.test(canopy1)
+table1_freq %>% 
+  ggplot(aes(x = Ground, y = Shrub)) +
+  geom_tile(aes(fill = Freq)) +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  geom_label(aes(label = round(Freq, 3)),
+            label.size = 0, # Keep this as is
+            color = "white", # Text color
+            fill = "#00000010", # Slight background around text to make it more legible
+            size = 5) # text size
+ggsave("Canopy Cover 1.png") 
 
 #canopy 2
 two_canopy <- data %>% 
@@ -81,12 +99,20 @@ two_canopy <- data %>%
 table_two <- xtabs(~Ground + Shrub, data= two_canopy)
  
 chisq.test(table_two)
+table2_freq <- as.data.frame( table_two/sum(table_two) )%>% 
+  mutate(cover = 2)
 
-canopy2 <- select(filter(data, Canopy == 2), Shrub, Ground)
-
-table(canopy2)
-
-chisq.test(canopy2)
+table2_freq %>% 
+  ggplot(aes(x = Ground, y = Shrub)) +
+  geom_tile(aes(fill = Freq)) +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  geom_label(aes(label = round(Freq, 3)),
+            label.size = 0, # Keep this as is
+            color = "white", # Text color
+            fill = "#00000010", # Slight background around text to make it more legible
+            size = 5) # text size
+ggsave("Canopy Cover 2.png")   
 
 #canopy 3
 three_canopy <- data %>% 
@@ -95,23 +121,74 @@ three_canopy <- data %>%
 table_three <- xtabs(~Ground + Shrub, data= three_canopy)
  
 chisq.test(table_three)
+table3_freq <- as.data.frame( table_three/sum(table_three) )%>% 
+  mutate(cover = 3)
 
-canopy3 <- select(filter(data, Canopy == 3), Shrub, Ground)
+table3_freq %>% 
+  ggplot(aes(x = Ground, y = Shrub)) +
+  geom_tile(aes(fill = Freq)) +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  geom_label(aes(label = round(Freq, 3)),
+            label.size = 0, # Keep this as is
+            color = "white", # Text color
+            fill = "#00000010", # Slight background around text to make it more legible
+            size = 5) # text size
+ggsave("Canopy Cover 3.png") 
 
-table(canopy3)
+#combining
+freq_data <- bind_rows(table0_freq, table1_freq, table2_freq, table3_freq) %>% 
+  mutate(Ground = factor(Ground, levels = c("0","1","2","3"))) 
 
-chisq.test(canopy3)
+freq_data %>% 
+  ggplot(aes(x = Ground, y = Shrub)) +
+  facet_wrap(facets = vars(cover)) +
+  geom_tile(aes(fill = Freq)) +
+  scale_fill_viridis_c() +
+  coord_fixed() +
+  geom_label(aes(label = round(Freq, 3)),
+            label.size = 0, # Keep this as is
+            color = "white", # Text color
+            fill = "#00000010", # Slight background around text to make it more legible
+            size = 2.5) # text size
+ggsave("Canopy Cover Freq.png")
 
-#PROPORTIONAL TABLES
-
-#canopy 0
-prop0 <- prop.table(canopy0)
-prop0
- 
 ```
 
 
+Historical Comparison
+```{r}
+data1 <- data
+data1$year <- "2021"
+old_data$year <- "2004"
 
+data_combo <- merge(data1, old_data, all = TRUE)
+
+canopy_compa <- data_combo %>% 
+  group_by(year) %>%
+  select(year, Canopy) %>% 
+  table()
+canopy_compa
+
+chisq.test(canopy_compa)
+
+shrub_compa <- data_combo %>% 
+  group_by(year) %>% 
+  select(year, Shrub) %>% 
+  table()
+shrub_compa
+
+chisq.test(shrub_compa)
+
+ground_compa <- data_combo %>% 
+  group_by(year) %>% 
+  select(year, Ground) %>% 
+  table()
+ground_compa
+
+chisq.test(ground_compa)
+  
+```
 
 
 
